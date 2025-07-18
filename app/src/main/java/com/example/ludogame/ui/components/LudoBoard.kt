@@ -345,34 +345,33 @@ fun PlayerColor.toColor(): Color = when (this) {
     PlayerColor.BLUE -> Color(0xFF3182CE)
 }
 
-// RESTORED: Complete position mapping including all previously blocked cells
+// Complete position mapping including all cells
 private val positionToGridMap = mapOf(
     // Red path starting from (13,6) going clockwise
     1 to (13 to 6),   // Red start
     2 to (12 to 6), 3 to (11 to 6), 4 to (10 to 6), 5 to (9 to 6),
     6 to (8 to 5), 7 to (8 to 4), 8 to (8 to 3), 9 to (8 to 2), 10 to (8 to 1), 11 to (8 to 0),
-    12 to (7 to 0), 13 to (6 to 0),  // RESTORED: (6,0) is now playable
+    12 to (7 to 0), 13 to (6 to 0),
 
     // Green path starting from (6,1) continuing clockwise
     14 to (6 to 1),   // Green start
     15 to (6 to 2), 16 to (6 to 3), 17 to (6 to 4), 18 to (6 to 5),
     19 to (5 to 6), 20 to (4 to 6), 21 to (3 to 6), 22 to (2 to 6), 23 to (1 to 6), 24 to (0 to 6),
-    25 to (0 to 7), 26 to (0 to 8),  // RESTORED: (0,8) is now playable
+    25 to (0 to 7), 26 to (0 to 8),
 
     // Yellow path starting from (1,8) continuing clockwise
     27 to (1 to 8),   // Yellow start
     28 to (2 to 8), 29 to (3 to 8), 30 to (4 to 8), 31 to (5 to 8),
     32 to (6 to 9), 33 to (6 to 10), 34 to (6 to 11), 35 to (6 to 12), 36 to (6 to 13), 37 to (6 to 14),
-    38 to (7 to 14), 39 to (8 to 14),  // RESTORED: (8,14) is now playable
+    38 to (7 to 14), 39 to (8 to 14),
 
     // Blue path starting from (8,13) continuing clockwise
     40 to (8 to 13),  // Blue start
     41 to (8 to 12), 42 to (8 to 11), 43 to (8 to 10), 44 to (8 to 9),
     45 to (9 to 8), 46 to (10 to 8), 47 to (11 to 8), 48 to (12 to 8), 49 to (13 to 8), 50 to (14 to 8),
-    51 to (14 to 7), 52 to (14 to 6)  // RESTORED: (14,6) is now playable
+    51 to (14 to 7), 52 to (14 to 6)
 )
 
-// Home paths that lead to center
 private val homePathToGridMap = mapOf(
     // Red home path: enters from (14,7) and moves toward center
     "rf52" to (14 to 7), "rf53" to (13 to 7), "rf54" to (12 to 7), "rf55" to (11 to 7), "rf56" to (10 to 7),

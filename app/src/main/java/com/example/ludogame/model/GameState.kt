@@ -6,7 +6,7 @@ data class GameState(
     val turnOrder: List<PlayerColor> = PlayerColor.values().toList(),
     val isDiceRolled: Boolean = false,
     val diceValue: Int = 1,
-    val winnerRank: MutableList<PlayerColor> = mutableListOf()  // Keep as MutableList
+    val winnerRank: MutableList<PlayerColor> = mutableListOf()
 ) {
     fun currentPlayer(): Player = players[turnOrder[currentPlayerIndex]]!!
     fun currentColor(): PlayerColor = turnOrder[currentPlayerIndex]

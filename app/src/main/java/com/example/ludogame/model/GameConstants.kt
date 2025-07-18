@@ -19,6 +19,14 @@ object GameConstants {
         6 to 6, 6 to 8, 8 to 8, 8 to 6
     )
 
+    // Color-specific bonus positions - tokens get +1 step when they would land on these cells
+    val COLOR_LANDING_BONUS_POSITIONS = mapOf(
+        PlayerColor.RED to 52,      // Red gets +1 step when landing on position 52 (14,6)
+        PlayerColor.GREEN to 13,    // Green gets +1 step when landing on position 13 (6,0)
+        PlayerColor.YELLOW to 52,   // Yellow gets +1 step when landing on position 52 (14,6)
+        PlayerColor.BLUE to 39      // Blue gets +1 step when landing on position 39 (8,14)
+    )
+
     // Home path entry positions
     val HOME_ENTRY_POSITIONS = mapOf(
         PlayerColor.RED to 52,     // Enters home path from (14,7)
@@ -35,7 +43,6 @@ object GameConstants {
         PlayerColor.BLUE to (7 to 8)      // Blue finishes at (7,8)
     )
 
-    // RESTORED: Complete main paths with all 52 positions including previously blocked cells
     val MAIN_PATHS = mapOf(
         PlayerColor.RED to listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52),
         PlayerColor.GREEN to listOf(14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13),
@@ -43,7 +50,6 @@ object GameConstants {
         PlayerColor.BLUE to listOf(40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39)
     )
 
-    // Home paths that lead to center
     val HOME_PATHS = mapOf(
         PlayerColor.RED to listOf("rf52", "rf53", "rf54", "rf55", "rf56"),      // 5 steps to finish
         PlayerColor.GREEN to listOf("gf13", "gf14", "gf15", "gf16", "gf17"),    // 5 steps to finish

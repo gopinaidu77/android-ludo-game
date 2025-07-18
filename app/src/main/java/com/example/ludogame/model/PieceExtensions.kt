@@ -14,7 +14,8 @@ fun Piece.isMovable(dice: Int): Boolean {
             val index = mainPath.indexOf(position)
             if (index == -1) false
             else {
-                val newIndex = index + dice
+                val effectiveDice = calculateEffectiveDiceForLanding(dice)
+                val newIndex = index + effectiveDice
                 if (newIndex < mainPath.size) {
                     true // Can move within main path
                 } else {
@@ -30,6 +31,28 @@ fun Piece.isMovable(dice: Int): Boolean {
         }
         else -> false
     }
+}
+
+fun Piece.calculateEffectiveDiceForLanding(dice: Int): Int {
+    if (position !is Int) return dice
+
+    val mainPath = GameConstants.MAIN_PATHS[color] ?: return dice
+    val bonusPosition = GameConstants.COLOR_LANDING_BONUS_POSITIONS[color] ?: return dice
+    val currentIndex = mainPath.indexOf(position)
+
+    if (currentIndex == -1) return dice
+
+    // Calculate where the token would land with the current dice value
+    val targetIndex = currentIndex + dice
+    if (targetIndex < mainPath.size) {
+        val targetPosition = mainPath[targetIndex]
+        // If the token would land on its bonus position, add +1 step
+        if (targetPosition == bonusPosition) {
+            return dice + 1
+        }
+    }
+
+    return dice
 }
 
 fun Piece.move(dice: Int, gameState: MutableState<GameState>) {
@@ -52,7 +75,9 @@ fun Piece.move(dice: Int, gameState: MutableState<GameState>) {
             when (position) {
                 is Int -> {
                     val index = mainPath.indexOf(position)
-                    val newIndex = index + dice
+                    val effectiveDice = calculateEffectiveDiceForLanding(dice)
+                    val newIndex = index + effectiveDice
+
                     if (newIndex < mainPath.size) {
                         position = mainPath[newIndex]
                     } else {
