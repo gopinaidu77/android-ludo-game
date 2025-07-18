@@ -93,7 +93,7 @@ private fun DrawScope.drawLudoBoard(cellSizePx: Float) {
     }
 
     // Draw center home triangle
-    drawCenterTriangle(cellSizePx)
+    drawCenterTriangles(cellSizePx)
 }
 
 private fun getCellColor(row: Int, col: Int): Color {
@@ -150,35 +150,42 @@ private fun DrawScope.drawStar(center: Offset, radius: Float) {
     drawPath(path, Color.Black, style = Stroke(width = 2.dp.toPx()))
 }
 
-private fun DrawScope.drawCenterTriangle(cellSizePx: Float) {
+private fun DrawScope.drawCenterTriangles(cellSizePx: Float) {
     val centerX = 7.5f * cellSizePx
     val centerY = 7.5f * cellSizePx
-    val triangleSize = cellSizePx * 1.5f
+    val radius = cellSizePx * 1.5f  // Bigger size
 
-    // Four triangles for each player color
     val triangles = listOf(
-        Triple(PlayerColor.GREEN.toColor(), 225.0, "top-left"),
-        Triple(PlayerColor.YELLOW.toColor(), 315.0, "top-right"),
-        Triple(PlayerColor.BLUE.toColor(), 45.0, "bottom-right"),
-        Triple(PlayerColor.RED.toColor(), 135.0, "bottom-left")
+        // Top (→ yellow)
+        Triple(PlayerColor.YELLOW.toColor(), Offset(centerX, centerY), listOf(
+            Offset(centerX - radius, centerY - radius),
+            Offset(centerX + radius, centerY - radius)
+        )),
+        // Right (→ blue)
+        Triple(PlayerColor.BLUE.toColor(), Offset(centerX, centerY), listOf(
+            Offset(centerX + radius, centerY - radius),
+            Offset(centerX + radius, centerY + radius)
+        )),
+        // Bottom (→ red)
+        Triple(PlayerColor.RED.toColor(), Offset(centerX, centerY), listOf(
+            Offset(centerX + radius, centerY + radius),
+            Offset(centerX - radius, centerY + radius)
+        )),
+        // Left (→ green)
+        Triple(PlayerColor.GREEN.toColor(), Offset(centerX, centerY), listOf(
+            Offset(centerX - radius, centerY + radius),
+            Offset(centerX - radius, centerY - radius)
+        ))
     )
 
-    triangles.forEach { (color, angle, _) ->
-        val path = Path()
-        val radians = angle * Math.PI / 180.0
-
-        path.moveTo(centerX, centerY)
-        path.lineTo(
-            centerX + (triangleSize * kotlin.math.cos(radians)).toFloat(),
-            centerY + (triangleSize * kotlin.math.sin(radians)).toFloat()
-        )
-        path.lineTo(
-            centerX + (triangleSize * kotlin.math.cos(radians + Math.PI/2)).toFloat(),
-            centerY + (triangleSize * kotlin.math.sin(radians + Math.PI/2)).toFloat()
-        )
-        path.close()
-
-        drawPath(path, color = color.copy(alpha = 0.6f))
+    triangles.forEach { (color, pivot, points) ->
+        val path = Path().apply {
+            moveTo(pivot.x, pivot.y)
+            lineTo(points[0].x, points[0].y)
+            lineTo(points[1].x, points[1].y)
+            close()
+        }
+        drawPath(path, color.copy(alpha = 0.999f))
     }
 }
 
