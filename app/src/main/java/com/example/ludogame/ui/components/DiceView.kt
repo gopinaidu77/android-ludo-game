@@ -27,11 +27,19 @@ fun DiceView(
     val size = 100.dp
     var displayValue by remember { mutableStateOf(value) }
     val context = LocalContext.current
-    val diceSound = remember { MediaPlayer.create(context, R.raw.dice_roll) }
+
+    // Add proper error handling for media player
+    val diceSound = remember {
+        try {
+            MediaPlayer.create(context, R.raw.dice_roll)
+        } catch (e: Exception) {
+            null // Handle case where sound file doesn't exist
+        }
+    }
 
     LaunchedEffect(rolled) {
         if (rolled) {
-            diceSound.start()
+            diceSound?.start()
             onStartRoll()
             val newValue = Random.nextInt(1, 7)
             delay(700)

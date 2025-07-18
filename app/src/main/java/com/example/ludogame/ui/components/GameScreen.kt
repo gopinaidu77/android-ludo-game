@@ -12,7 +12,6 @@ import com.example.ludogame.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen() {
     var gameState by remember { mutableStateOf(GameState()) }

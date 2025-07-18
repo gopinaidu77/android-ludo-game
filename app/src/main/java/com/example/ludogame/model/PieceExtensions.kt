@@ -14,8 +14,13 @@ fun Piece.isMovable(dice: Int): Boolean {
             val index = mainPath.indexOf(position)
             if (index == -1) false
             else {
-                val stepsToFinish = (mainPath.size - index - 1) + homePath.size + 1
-                dice <= stepsToFinish
+                val newIndex = index + dice
+                if (newIndex < mainPath.size) {
+                    true // Can move within main path
+                } else {
+                    val homeIndex = newIndex - mainPath.size
+                    homeIndex <= homePath.size
+                }
             }
         }
         is String -> {
@@ -63,6 +68,7 @@ fun Piece.move(dice: Int, gameState: MutableState<GameState>) {
                 is String -> {
                     val index = homePath.indexOf(position)
                     val newIndex = index + dice
+
                     if (newIndex < homePath.size) {
                         position = homePath[newIndex]
                     } else if (newIndex == homePath.size) {
@@ -94,9 +100,7 @@ fun Piece.move(dice: Int, gameState: MutableState<GameState>) {
     // Check if player has won
     val player = gameState.value.players[color]!!
     if (player.hasWon() && !gameState.value.winnerRank.contains(color)) {
-        gameState.value = gameState.value.copy(
-            winnerRank = (gameState.value.winnerRank + color).toMutableList()
-        )
+        gameState.value.winnerRank.add(color)
     }
 
     // Handle turn logic
@@ -120,6 +124,7 @@ fun switchTurn(gameState: MutableState<GameState>) {
 
     gameState.value = state.copy(
         currentPlayerIndex = newPlayerIndex,
-        isDiceRolled = false
+        isDiceRolled = false,
+        diceValue = 1
     )
 }

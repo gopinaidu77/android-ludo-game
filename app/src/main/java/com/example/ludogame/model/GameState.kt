@@ -2,11 +2,11 @@ package com.example.ludogame.model
 
 data class GameState(
     val players: Map<PlayerColor, Player> = PlayerColor.values().associateWith { Player(it) },
-    var currentPlayerIndex: Int = 0,
+    val currentPlayerIndex: Int = 0,
     val turnOrder: List<PlayerColor> = PlayerColor.values().toList(),
-    var isDiceRolled: Boolean = false,
-    var diceValue: Int = 1,
-    val winnerRank: MutableList<PlayerColor> = mutableListOf()
+    val isDiceRolled: Boolean = false,
+    val diceValue: Int = 1,
+    val winnerRank: MutableList<PlayerColor> = mutableListOf()  // Keep as MutableList
 ) {
     fun currentPlayer(): Player = players[turnOrder[currentPlayerIndex]]!!
     fun currentColor(): PlayerColor = turnOrder[currentPlayerIndex]

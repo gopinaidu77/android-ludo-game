@@ -1,7 +1,6 @@
 package com.example.ludogame.ui
 
 import android.content.Context
-import com.example.ludogame.model.isMovable
 import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,7 +33,7 @@ fun LudoGameScreen() {
             "${currentColor.name.lowercase().replaceFirstChar { it.uppercase() }}'s turn. Roll the dice!"
 
         currentPlayer.pieces.none { it.isMovable(gameState.value.diceValue) } ->
-            "No movable pieces! Turn will skip..."
+            "No movable pieces! skip..."
 
         currentPlayer.pieces.all { it.state == PieceState.HOME } && gameState.value.diceValue != 6 ->
             "You need a 6 to enter the board!"
@@ -61,8 +60,10 @@ fun LudoGameScreen() {
             value = gameState.value.diceValue,
             rolled = diceRolled,
             onRollComplete = { newValue ->
-                gameState.value.diceValue = newValue
-                gameState.value.isDiceRolled = true
+                gameState.value = gameState.value.copy(
+                    diceValue = newValue,
+                    isDiceRolled = true
+                )
                 diceRolled = false
             },
             onStartRoll = {
@@ -71,17 +72,17 @@ fun LudoGameScreen() {
         )
 
         // This effect will react to dice changes and handle auto-moving/skipping
-        LaunchedEffect(gameState.value.diceValue) {
+        LaunchedEffect(gameState.value.diceValue, gameState.value.isDiceRolled) {
             if (gameState.value.isDiceRolled) {
                 val movable = currentPlayer.pieces.filter { it.isMovable(gameState.value.diceValue) }
                 when (movable.size) {
                     0 -> {
                         delay(700)
-                        switchTurn(gameState, gameState.value.diceValue)
+                        switchTurn(gameState)
                     }
                     1 -> {
                         delay(500)
-                        movable[0].move(gameState.value.diceValue, gameState, context)
+                        movable[0].move(gameState.value.diceValue, gameState)
                     }
                     else -> { /* Wait for user tap to move */ }
                 }
@@ -92,7 +93,7 @@ fun LudoGameScreen() {
 
         Button(
             onClick = { diceRolled = true },
-            enabled = !diceRolled,
+            enabled = !diceRolled && !gameState.value.isDiceRolled,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4C51BF))
         ) {
             Text("Roll Dice", color = Color.White)
@@ -100,113 +101,13 @@ fun LudoGameScreen() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        LudoBoard(modifier = Modifier.fillMaxWidth(), gameState = gameState.value) {
-            it.move(gameState.value.diceValue, gameState, context)
+        LudoBoard(
+            modifier = Modifier.fillMaxWidth(),
+            gameState = gameState.value
+        ) { piece ->
+            piece.move(gameState.value.diceValue, gameState)
         }
     }
-}
-
-fun Piece.isMovable(dice: Int): Boolean {
-    if (state == PieceState.FINISHED) return false
-    if (state == PieceState.HOME) return dice == 6
-
-    val mainPath = GameConstants.MAIN_PATHS[color] ?: return false
-    val homePath = GameConstants.HOME_PATHS[color] ?: return false
-
-    return when (position) {
-        is Int -> {
-            val index = mainPath.indexOf(position)
-            if (index == -1) false
-            else dice <= (mainPath.size - index - 1 + homePath.size)
-        }
-        is String -> {
-            val index = homePath.indexOf(position)
-            index != -1 && (index + dice) <= homePath.size
-        }
-        else -> false
-    }
-}
-
-fun Piece.move(dice: Int, gameState: MutableState<GameState>, context: Context) {
-    val mainPath = GameConstants.MAIN_PATHS[color]!!
-    val homePath = GameConstants.HOME_PATHS[color]!!
-
-    var killed = false
-
-    when (state) {
-        PieceState.HOME -> {
-            if (dice == 6) {
-                state = PieceState.ACTIVE
-                position = GameConstants.START_POSITIONS[color]!!
-            }
-        }
-        PieceState.ACTIVE -> {
-            when (position) {
-                is Int -> {
-                    val index = mainPath.indexOf(position)
-                    val newIndex = index + dice
-                    position = if (newIndex < mainPath.size) {
-                        mainPath[newIndex]
-                    } else {
-                        val homeIndex = newIndex - mainPath.size
-                        if (homeIndex < homePath.size) homePath[homeIndex] else {
-                            state = PieceState.FINISHED
-                            return
-                        }
-                    }
-                }
-                is String -> {
-                    val index = homePath.indexOf(position)
-                    val newIndex = index + dice
-                    if (newIndex < homePath.size) {
-                        position = homePath[newIndex]
-                    } else if (newIndex == homePath.size) {
-                        state = PieceState.FINISHED
-                    }
-                }
-            }
-        }
-        else -> {}
-    }
-
-    if (position is Int && !GameConstants.SAFE_SPOTS.contains(position)) {
-        gameState.value.players.forEach { (pColor, player) ->
-            if (pColor != color) {
-                player.pieces.forEach {
-                    if (it.position == position && it.state == PieceState.ACTIVE) {
-                        it.position = -1
-                        it.state = PieceState.HOME
-                        killed = true
-                    }
-                }
-            }
-        }
-    }
-
-   // MediaPlayer.create(context, R.raw.piece_move)?.start()
-
-    val player = gameState.value.players[color]!!
-    if (player.hasWon() && !gameState.value.winnerRank.contains(color)) {
-        gameState.value.winnerRank.add(color)
-    }
-
-    if (dice == 6 || killed || state == PieceState.FINISHED) {
-        gameState.value.isDiceRolled = false
-        return
-    }
-
-    switchTurn(gameState, dice)
-}
-
-fun switchTurn(gameState: MutableState<GameState>, dice: Int) {
-    val state = gameState.value
-    do {
-        state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.turnOrder.size
-    } while (
-        state.players[state.currentColor()]!!.hasWon() &&
-        state.winnerRank.size < 4
-    )
-    state.isDiceRolled = false
 }
 
 fun playerColor(player: PlayerColor): Color = when (player) {
